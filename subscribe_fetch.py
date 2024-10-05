@@ -6,6 +6,7 @@ import json
 
 # -*- Config -*-
 
+# sing-box configuration
 subscribe_url = ""
 
 def fetch(url):
@@ -14,9 +15,17 @@ def fetch(url):
 
 def parser(data):
     # -*- dns setting -*-
+    data['dns']['final'] = 'local'
+    data['dns']['servers'].append({
+        "tag" : "google",
+        "address" : "tls://8.8.8.8",
+    })
     for server in data['dns']['servers']:
         if server['tag'] == 'local':
             server['address'] = '223.5.5.5'
+    for rule in data['dns']['rules']:
+        if 'invert' in rule and 'geosite' in rule and rule['geosite'] == 'cn':
+            rule['server'] = 'google'
 
     # -*- outbounds setting -*-
     data['outbounds'].append({
